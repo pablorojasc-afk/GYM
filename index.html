@@ -1111,14 +1111,50 @@
         }
 
         // =============================================
-        // CÓDIGO PARA INSTALACIÓN PWA
+        // CÓDIGO PARA INSTALACIÓN PWA - VERSIÓN CORREGIDA
         // =============================================
+        
+        // Detectar y corregir ruta incorrecta al abrir como PWA
+        (function() {
+            const currentPath = window.location.pathname;
+            const correctBase = '/GYM/';
+            
+            console.log('📍 Ruta actual:', currentPath);
+            console.log('📍 URL completa:', window.location.href);
+            
+            // Si estamos en la raíz (/), redirigir a /GYM/
+            if (currentPath === '/' || currentPath === '/index.html') {
+                console.log('🔄 Redirigiendo a /GYM/ desde raíz...');
+                window.location.href = '/GYM/index.html';
+                return;
+            }
+            
+            // Si estamos en una PWA pero en ruta incorrecta
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('📱 Modo: PWA instalada');
+                
+                // Verificar si estamos en la ruta correcta
+                if (!currentPath.startsWith(correctBase)) {
+                    console.log('⚠️ PWA en ruta incorrecta, redirigiendo...');
+                    
+                    // Construir URL correcta
+                    const correctUrl = `${window.location.origin}${correctBase}index.html`;
+                    console.log('🔄 Redirigiendo a:', correctUrl);
+                    
+                    // Pequeño delay para evitar loops
+                    setTimeout(() => {
+                        window.location.href = correctUrl;
+                    }, 100);
+                }
+            }
+        })();
+
         let deferredPrompt;
         const installButton = document.getElementById('installButton');
 
         // Mostrar botón cuando se pueda instalar
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('✅ Evento beforeinstallprompt disparado');
+            console.log('🎯 Evento beforeinstallprompt disparado');
             e.preventDefault();
             deferredPrompt = e;
             installButton.style.display = 'block';
@@ -1133,9 +1169,9 @@
 
         // Instalar app
         installButton.addEventListener('click', async () => {
-            console.log('Click en instalar app');
+            console.log('🖱️ Click en instalar app');
             if (!deferredPrompt) {
-                console.log('No hay deferredPrompt');
+                console.log('❌ No hay deferredPrompt disponible');
                 return;
             }
             
@@ -1147,73 +1183,167 @@
                 installButton.style.display = 'none';
                 
                 // Mostrar mensaje de éxito
-                const message = document.createElement('div');
-                message.textContent = '✅ App instalada correctamente';
-                message.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #27ae60;
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 8px;
-                    z-index: 10000;
-                    animation: fadeInOut 3s;
-                `;
-                document.body.appendChild(message);
-                setTimeout(() => message.remove(), 3000);
+                showNotification('✅ App instalada correctamente', 'success');
             } else {
                 console.log('❌ Usuario canceló la instalación');
+                showNotification('Instalación cancelada', 'warning');
             }
             
             deferredPrompt = null;
         });
 
         // Ocultar botón si ya está instalada
-        window.addEventListener('appinstalled', () => {
-            console.log('✅ PWA ya está instalada');
+        window.addEventListener('appinstalled', (e) => {
+            console.log('🎉 PWA instalada con éxito');
             installButton.style.display = 'none';
+            showNotification('¡App instalada! Ábrela desde tu pantalla de inicio', 'success');
+            
+            // Guardar en localStorage que ya está instalada
+            localStorage.setItem('pwa_installed', 'true');
         });
 
-        // Registrar Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Ruta CORRECTA para tu repositorio
-                navigator.serviceWorker.register('/GYM/sw.js')
-                    .then(reg => {
-                        console.log('✅ Service Worker registrado:', reg);
-                        console.log('Scope:', reg.scope);
+        // Registrar Service Worker CON SCOPE CORRECTO
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                console.log('🛠️ Intentando registrar Service Worker...');
+                
+                const swUrl = '/GYM/sw.js';
+                const scope = '/GYM/';
+                
+                navigator.serviceWorker.register(swUrl, { scope: scope })
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado exitosamente');
+                        console.log('📁 Scope:', registration.scope);
+                        console.log('🔄 Estado:', registration.active ? 'Activo' : 'Inactivo');
+                        
+                        // Verificar si estamos siendo controlados
+                        if (navigator.serviceWorker.controller) {
+                            console.log('🎮 Esta página está controlada por Service Worker');
+                        }
+                        
+                        // Forzar actualización
+                        registration.update();
+                        
+                        return registration;
                     })
-                    .catch(err => {
-                        console.log('❌ Error Service Worker:', err);
-                        console.log('Intentando ruta alternativa...');
+                    .catch(error => {
+                        console.error('❌ Error al registrar Service Worker:', error);
+                        
                         // Intentar ruta alternativa
-                        navigator.serviceWorker.register('./sw.js')
-                            .then(reg => console.log('✅ SW registrado en ruta alternativa'))
-                            .catch(err2 => console.log('❌ Error en ruta alternativa:', err2));
+                        console.log('🔄 Intentando ruta alternativa...');
+                        navigator.serviceWorker.register('./sw.js', { scope: './' })
+                            .then(reg => {
+                                console.log('✅ SW registrado en ruta alternativa');
+                            })
+                            .catch(err => {
+                                console.error('❌ Error en ruta alternativa:', err);
+                            });
                     });
-            });
+            } else {
+                console.log('❌ Service Worker no soportado en este navegador');
+            }
         }
 
-        // Verificar estado PWA
-        console.log('📊 PWA Status:', {
-            hasSW: 'serviceWorker' in navigator,
-            isHTTPS: window.location.protocol === 'https:',
-            standalone: window.matchMedia('(display-mode: standalone)').matches,
-            url: window.location.href
-        });
-
-        // Forzar chequeo después de 3 segundos
-        setTimeout(() => {
-            if (installButton.style.display === 'none' && !deferredPrompt) {
-                console.log('🔄 Revisando si se puede instalar...');
-                // Verificar si ya es instalable
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    console.log('✅ Ya está instalada como PWA');
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#27ae60',
+                error: '#e74c3c',
+                warning: '#f39c12',
+                info: '#3498db'
+            };
+            
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: fadeInOut 3s ease-in-out;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
                 }
+            }, 3000);
+        }
+
+        // Verificar estado PWA completo
+        function checkPWAStatus() {
+            const status = {
+                hasSW: 'serviceWorker' in navigator,
+                isHTTPS: window.location.protocol === 'https:',
+                isLocalhost: window.location.hostname === 'localhost',
+                isGitHubPages: window.location.hostname.includes('github.io'),
+                displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
+                url: window.location.href,
+                path: window.location.pathname,
+                manifest: document.querySelector('link[rel="manifest"]') ? 'Presente' : 'Faltante'
+            };
+            
+            console.log('📊 ESTADO PWA COMPLETO:', status);
+            
+            // Mostrar en consola si hay problemas
+            if (!status.hasSW) {
+                console.warn('⚠️ Service Worker no soportado');
             }
-        }, 3000);
+            if (!status.isHTTPS) {
+                console.warn('⚠️ No está en HTTPS (requerido para PWA)');
+            }
+            if (status.manifest === 'Faltante') {
+                console.warn('⚠️ Manifest.json no encontrado');
+            }
+            
+            return status;
+        }
+
+        // Inicializar todo cuando cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando app PWA...');
+            
+            // Esperar un momento para que todo cargue
+            setTimeout(() => {
+                // Registrar Service Worker
+                registerServiceWorker();
+                
+                // Verificar estado
+                checkPWAStatus();
+                
+                // Verificar si ya está instalada
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    console.log('📱 La app está funcionando como PWA instalada');
+                    installButton.style.display = 'none';
+                    
+                    // Verificar ruta actual
+                    const currentPath = window.location.pathname;
+                    if (!currentPath.startsWith('/GYM/')) {
+                        console.warn('⚠️ PWA en ruta incorrecta, sugiriendo recarga...');
+                        setTimeout(() => {
+                            window.location.href = '/GYM/index.html';
+                        }, 500);
+                    }
+                } else {
+                    console.log('🌐 La app está en navegador web');
+                }
+                
+                // Verificar cada 5 segundos si se puede instalar
+                setInterval(() => {
+                    if (deferredPrompt && installButton.style.display === 'none') {
+                        installButton.style.display = 'block';
+                    }
+                }, 5000);
+            }, 1000);
+        });
         
         // Inicializar aplicación
         function initApp() {

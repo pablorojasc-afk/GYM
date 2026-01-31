@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Entrenamiento</title>
     
     <!-- METADATOS PARA PWA -->
@@ -12,18 +12,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Mi Entrenamiento">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        
-    <link rel="manifest" href="/GYM/manifest.json">
-    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/3163/3163470.png">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3163/3163470.png">
-        
+    
     <!-- OPEN GRAPH PARA MEJOR COMPARTIR -->
     <meta property="og:title" content="Mi Entrenamiento">
     <meta property="og:description" content="Registro de rutinas de gym">
     <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3163/3163470.png">
     <meta property="og:url" content="https://pablorojasc-afk.github.io/GYM/">
+    
+    <link rel="manifest" href="/GYM/manifest.json">
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/512/3163/3163470.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3163/3163470.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -485,6 +485,37 @@
                 align-self: flex-start;
             }
         }
+
+        /* ESTILOS PARA BOTÓN DE INSTALACIÓN PWA */
+        #installButton {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 15px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            z-index: 9999;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        #installButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: 10px; }
+            20% { opacity: 1; top: 20px; }
+            80% { opacity: 1; top: 20px; }
+            100% { opacity: 0; top: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -571,6 +602,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- BOTÓN DE INSTALACIÓN PWA -->
+    <button id="installButton">
+        📲 Instalar App
+    </button>
     
     <div class="footer">
         <button class="footer-btn active" data-tab="exercises">
@@ -1073,6 +1109,111 @@
                 changeTab('exercises');
             }
         }
+
+        // =============================================
+        // CÓDIGO PARA INSTALACIÓN PWA
+        // =============================================
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        // Mostrar botón cuando se pueda instalar
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('✅ Evento beforeinstallprompt disparado');
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+            
+            // Mostrar por 30 segundos
+            setTimeout(() => {
+                if (installButton.style.display === 'block') {
+                    installButton.style.display = 'none';
+                }
+            }, 30000);
+        });
+
+        // Instalar app
+        installButton.addEventListener('click', async () => {
+            console.log('Click en instalar app');
+            if (!deferredPrompt) {
+                console.log('No hay deferredPrompt');
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ App instalada correctamente');
+                installButton.style.display = 'none';
+                
+                // Mostrar mensaje de éxito
+                const message = document.createElement('div');
+                message.textContent = '✅ App instalada correctamente';
+                message.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #27ae60;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    animation: fadeInOut 3s;
+                `;
+                document.body.appendChild(message);
+                setTimeout(() => message.remove(), 3000);
+            } else {
+                console.log('❌ Usuario canceló la instalación');
+            }
+            
+            deferredPrompt = null;
+        });
+
+        // Ocultar botón si ya está instalada
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA ya está instalada');
+            installButton.style.display = 'none';
+        });
+
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Ruta CORRECTA para tu repositorio
+                navigator.serviceWorker.register('/GYM/sw.js')
+                    .then(reg => {
+                        console.log('✅ Service Worker registrado:', reg);
+                        console.log('Scope:', reg.scope);
+                    })
+                    .catch(err => {
+                        console.log('❌ Error Service Worker:', err);
+                        console.log('Intentando ruta alternativa...');
+                        // Intentar ruta alternativa
+                        navigator.serviceWorker.register('./sw.js')
+                            .then(reg => console.log('✅ SW registrado en ruta alternativa'))
+                            .catch(err2 => console.log('❌ Error en ruta alternativa:', err2));
+                    });
+            });
+        }
+
+        // Verificar estado PWA
+        console.log('📊 PWA Status:', {
+            hasSW: 'serviceWorker' in navigator,
+            isHTTPS: window.location.protocol === 'https:',
+            standalone: window.matchMedia('(display-mode: standalone)').matches,
+            url: window.location.href
+        });
+
+        // Forzar chequeo después de 3 segundos
+        setTimeout(() => {
+            if (installButton.style.display === 'none' && !deferredPrompt) {
+                console.log('🔄 Revisando si se puede instalar...');
+                // Verificar si ya es instalable
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    console.log('✅ Ya está instalada como PWA');
+                }
+            }
+        }, 3000);
         
         // Inicializar aplicación
         function initApp() {

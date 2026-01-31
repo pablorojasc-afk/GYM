@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirigiendo a Mi Entrenamiento</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn {
+            background: white;
+            color: #3498db;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        // Redirigir automáticamente a la app correcta
+        (function() {
+            console.log('🔍 Detectando ruta para redirección...');
+            
+            const currentUrl = window.location.href;
+            const correctUrl = 'https://pablorojasc-afk.github.io/GYM/index.html';
+            
+            // Si no estamos ya en la URL correcta, redirigir
+            if (!currentUrl.includes('/GYM/index.html') && currentUrl !== correctUrl) {
+                console.log('🔄 Redirigiendo a:', correctUrl);
+                
+                // Pequeño delay para mostrar el mensaje
+                setTimeout(() => {
+                    window.location.href = correctUrl;
+                }, 2000);
+            } else {
+                console.log('✅ Ya en la URL correcta');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Mi Entrenamiento</h1>
+        <p>La aplicación se está moviendo a una nueva ubicación.</p>
+        <p>Redirigiendo automáticamente en unos segundos...</p>
+        
+        <div class="spinner"></div>
+        
+        <p>Si no se redirige automáticamente, haz clic en el botón:</p>
+        
+        <a href="/GYM/index.html" class="btn">Ir a la aplicación</a>
+        
+        <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">
+            Si instalaste la app y ves este error, desinstálala y reinstálala desde:<br>
+            <strong>https://pablorojasc-afk.github.io/GYM/</strong>
+        </p>
+    </div>
+</body>
+</html>

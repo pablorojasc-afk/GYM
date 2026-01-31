@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Entrenamiento Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --edit: #9b59b6;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .user-section {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-input {
+            display: flex;
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .user-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid var(--light);
+            border-radius: 8px 0 0 8px;
+            font-size: 1rem;
+        }
+        
+        .user-input button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .day-selection {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .day-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .day-card.active {
+            border: 3px solid var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .day-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .day-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .day-muscles {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .exercise-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 8px;
+        }
+        
+        .add-exercise-btn {
+            background-color: var(--edit);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .exercise-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .exercise-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+        
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .exercise-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            flex: 1;
+        }
+        
+        .exercise-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .exercise-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .edit-btn {
+            color: var(--edit);
+        }
+        
+        .edit-btn:hover {
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+        
+        .delete-btn {
+            color: var(--danger);
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .exercise-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        
+        .form-group input {
+            padding: 10px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .save-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .save-btn:hover {
+            background-color: #219653;
+        }
+        
+        .records-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .records-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .record-date {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .record-info {
+            font-weight: 600;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            text-align: center;
+        }
+        
+        .modal-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .confirm-btn {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .cancel-btn {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .delete-modal .confirm-btn {
+            background-color: var(--danger);
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+        
+        .footer-btn {
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+        
+        .footer-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .footer-btn.active {
+            color: var(--primary);
+            font-weight: 600;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .change-user-btn {
+            background-color: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .day-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercise-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-input {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .add-exercise-btn {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-dumbbell"></i> Registro de Entrenamiento Pro</h1>
+            <p class="subtitle">Registra y personaliza tus ejercicios para seguir tu progreso</p>
+        </header>
+        
+        <div class="user-section">
+            <div class="user-input">
+                <input type="text" id="userName" placeholder="Ingresa tu nombre">
+                <button id="setUserBtn">Guardar Nombre</button>
+            </div>
+            <div class="user-profile">
+                <span class="user-name" id="currentUser">Usuario1</span>
+                <button class="change-user-btn" id="changeUserBtn">Cambiar</button>
+            </div>
+        </div>
+        
+        <div class="day-selection">
+            <div class="day-card active" data-day="1">
+                <div class="day-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="day-name">Día 1</div>
+                <div class="day-muscles">Pecho, Hombros, Tríceps</div>
+            </div>
+            <div class="day-card" data-day="2">
+                <div class="day-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="day-name">Día 2</div>
+                <div class="day-muscles">Espalda, Bíceps</div>
+            </div>
+            <div class="day-card" data-day="3">
+                <div class="day-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="day-name">Día 3</div>
+                <div class="day-muscles">Piernas, Abs</div>
+            </div>
+        </div>
+        
+        <div class="exercise-section">
+            <div class="section-header">
+                <h2 class="section-title">Ejercicios del Día</h2>
+                <button class="add-exercise-btn" id="addExerciseBtn">
+                    <i class="fas fa-plus"></i> Agregar Ejercicio
+                </button>
+            </div>
+            <div class="exercise-list" id="exerciseList">
+                <!-- Los ejercicios se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+        
+        <div class="records-section">
+            <h2 class="section-title">Registros Anteriores</h2>
+            <div class="records-list" id="recordsList">
+                <!-- Los registros se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para agregar/editar ejercicio -->
+    <div class="modal" id="exerciseModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Agregar Nuevo Ejercicio</h2>
+            <form class="modal-form" id="exerciseForm">
+                <div class="form-group">
+                    <label for="exerciseName">Nombre del ejercicio</label>
+                    <input type="text" id="exerciseName" placeholder="Ej: Press de banca" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn cancel-btn" id="cancelExerciseBtn">Cancelar</button>
+                    <button type="submit" class="modal-btn confirm-btn" id="saveExerciseBtn">Guardar Ejercicio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal para confirmar eliminación -->
+    <div class="modal delete-modal" id="deleteModal">
+        <div class="modal-content">
+            <h2 class="modal-title">¿Eliminar Ejercicio?</h2>
+            <p id="deleteMessage">¿Estás seguro de que quieres eliminar este ejercicio? También se eliminarán todos sus registros.</p>
+            <div class="modal-buttons">
+                <button type="button" class="modal-btn cancel-btn" id="cancelDeleteBtn">Cancelar</button>
+                <button type="button" class="modal-btn confirm-btn" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <button class="footer-btn active" data-tab="exercises">
+            <i class="fas fa-dumbbell"></i>
+            <span>Ejercicios</span>
+        </button>
+        <button class="footer-btn" data-tab="records">
+            <i class="fas fa-history"></i>
+            <span>Historial</span>
+        </button>
+        <button class="footer-btn" data-tab="manage">
+            <i class="fas fa-edit"></i>
+            <span>Gestionar</span>
+        </button>
+        <button class="footer-btn" data-tab="share">
+            <i class="fas fa-share-alt"></i>
+            <span>Compartir</span>
+        </button>
+    </div>
+
+    <script>
+        // Datos de la aplicación
+        let workoutData = {
+            day1: {
+                name: "Día 1: Pecho, Hombros, Tríceps",
+                exercises: [
+                    { id: 1, name: "Press de banca" },
+                    { id: 2, name: "Press militar" },
+                    { id: 3, name: "Aperturas con mancuernas" },
+                    { id: 4, name: "Elevaciones laterales" },
+                    { id: 5, name: "Fondos en paralelas" },
+                    { id: 6, name: "Extensiones de tríceps" }
+                ]
+            },
+            day2: {
+                name: "Día 2: Espalda, Bíceps",
+                exercises: [
+                    { id: 7, name: "Dominadas" },
+                    { id: 8, name: "Remo con barra" },
+                    { id: 9, name: "Jalón al pecho" },
+                    { id: 10, name: "Curl de bíceps con barra" },
+                    { id: 11, name: "Curl martillo" },
+                    { id: 12, name: "Remo con mancuerna" }
+                ]
+            },
+            day3: {
+                name: "Día 3: Piernas, Abs",
+                exercises: [
+                    { id: 13, name: "Sentadillas" },
+                    { id: 14, name: "Peso muerto" },
+                    { id: 15, name: "Extensiones de cuadriceps" },
+                    { id: 16, name: "Curl femoral" },
+                    { id: 17, name: "Elevaciones de talones" },
+                    { id: 18, name: "Plancha abdominal" },
+                    { id: 19, name: "Elevaciones de piernas" }
+                ]
+            }
+        };
+
+        // Estado de la aplicación
+        let currentUser = "Usuario1";
+        let currentDay = 1;
+        let userData = {};
+        let editingExerciseId = null;
+        let exerciseToDelete = null;
+        
+        // Inicializar datos del usuario si no existen
+        function initUserData() {
+            // Cargar workoutData personalizado
+            const savedWorkoutData = localStorage.getItem('workoutAppExercises');
+            if (savedWorkoutData) {
+                workoutData = JSON.parse(savedWorkoutData);
+            }
+            
+            if (!localStorage.getItem('workoutAppData')) {
+                // Crear estructura inicial para el usuario actual
+                userData[currentUser] = {
+                    day1: {},
+                    day2: {},
+                    day3: {}
+                };
+                saveUserData();
+            } else {
+                userData = JSON.parse(localStorage.getItem('workoutAppData'));
+                
+                // Si el usuario actual no existe en los datos, crearlo
+                if (!userData[currentUser]) {
+                    userData[currentUser] = {
+                        day1: {},
+                        day2: {},
+                        day3: {}
+                    };
+                    saveUserData();
+                }
+            }
+        }
+        
+        // Guardar datos del usuario
+        function saveUserData() {
+            localStorage.setItem('workoutAppData', JSON.stringify(userData));
+        }
+        
+        // Guardar ejercicios personalizados
+        function saveWorkoutData() {
+            localStorage.setItem('workoutAppExercises', JSON.stringify(workoutData));
+        }
+        
+        // Cargar datos del usuario
+        function loadUserData() {
+            userData = JSON.parse(localStorage.getItem('workoutAppData'));
+            if (!userData[currentUser]) {
+                userData[currentUser] = {
+                    day1: {},
+                    day2: {},
+                    day3: {}
+                };
+                saveUserData();
+            }
+        }
+        
+        // Cambiar usuario
+        function changeUser(name) {
+            currentUser = name;
+            document.getElementById('currentUser').textContent = name;
+            loadUserData();
+            renderExercises();
+            renderRecords();
+        }
+        
+        // Cambiar día seleccionado
+        function changeDay(day) {
+            currentDay = day;
+            
+            // Actualizar tarjetas de día
+            document.querySelectorAll('.day-card').forEach(card => {
+                card.classList.remove('active');
+                if (parseInt(card.dataset.day) === day) {
+                    card.classList.add('active');
+                }
+            });
+            
+            renderExercises();
+            renderRecords();
+        }
+        
+        // Renderizar ejercicios del día actual
+        function renderExercises() {
+            const exerciseList = document.getElementById('exerciseList');
+            const dayKey = `day${currentDay}`;
+            const exercises = workoutData[dayKey].exercises;
+            
+            exerciseList.innerHTML = '';
+            
+            if (exercises.length === 0) {
+                exerciseList.innerHTML = `
+                    <div class="no-data">
+                        No hay ejercicios para este día. ¡Agrega algunos!
+                    </div>
+                `;
+                return;
+            }
+            
+            exercises.forEach(exercise => {
+                const exerciseItem = document.createElement('div');
+                exerciseItem.className = 'exercise-item';
+                
+                // Obtener el último registro del usuario para este ejercicio
+                const userRecords = userData[currentUser][dayKey][exercise.id] || [];
+                const lastRecord = userRecords.length > 0 ? userRecords[userRecords.length - 1] : null;
+                
+                exerciseItem.innerHTML = `
+                    <div class="exercise-header">
+                        <div class="exercise-name">${exercise.name}</div>
+                        <div class="exercise-actions">
+                            <button class="exercise-btn edit-btn" data-exercise="${exercise.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="exercise-btn delete-btn" data-exercise="${exercise.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="exercise-form">
+                        <div class="form-group">
+                            <label for="weight-${exercise.id}">Peso (kg)</label>
+                            <input type="number" id="weight-${exercise.id}" placeholder="Ej: 50" value="${lastRecord ? lastRecord.weight : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label for="reps-${exercise.id}">Repeticiones</label>
+                            <input type="number" id="reps-${exercise.id}" placeholder="Ej: 12" value="${lastRecord ? lastRecord.reps : ''}">
+                        </div>
+                    </div>
+                    <button class="save-btn" data-exercise="${exercise.id}">Guardar Registro</button>
+                `;
+                
+                exerciseList.appendChild(exerciseItem);
+            });
+            
+            // Añadir event listeners a los botones
+            document.querySelectorAll('.save-btn').forEach(btn => {
+                btn.addEventListener('click', saveExerciseRecord);
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', editExercise);
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', showDeleteModal);
+            });
+        }
+        
+        // Guardar registro de ejercicio
+        function saveExerciseRecord(e) {
+            const exerciseId = parseInt(e.target.dataset.exercise);
+            const dayKey = `day${currentDay}`;
+            const weightInput = document.getElementById(`weight-${exerciseId}`);
+            const repsInput = document.getElementById(`reps-${exerciseId}`);
+            
+            const weight = parseFloat(weightInput.value);
+            const reps = parseInt(repsInput.value);
+            
+            if (!weight || !reps || weight <= 0 || reps <= 0) {
+                alert('Por favor ingresa valores válidos para peso y repeticiones');
+                return;
+            }
+            
+            // Obtener el nombre del ejercicio
+            const exercise = workoutData[dayKey].exercises.find(e => e.id === exerciseId);
+            if (!exercise) {
+                alert('Ejercicio no encontrado');
+                return;
+            }
+            
+            // Crear registro
+            const record = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('es-ES'),
+                time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                exerciseId,
+                exerciseName: exercise.name,
+                weight,
+                reps
+            };
+            
+            // Inicializar array para el ejercicio si no existe
+            if (!userData[currentUser][dayKey][exerciseId]) {
+                userData[currentUser][dayKey][exerciseId] = [];
+            }
+            
+            // Añadir registro
+            userData[currentUser][dayKey][exerciseId].push(record);
+            
+            // Guardar datos
+            saveUserData();
+            
+            // Actualizar interfaz
+            renderRecords();
+            
+            // Mostrar confirmación
+            alert(`Registro guardado: ${record.exerciseName} - ${weight}kg x ${reps} repeticiones`);
+        }
+        
+        // Mostrar modal para agregar/editar ejercicio
+        function showExerciseModal(editMode = false, exerciseId = null) {
+            const modal = document.getElementById('exerciseModal');
+            const title = document.getElementById('modalTitle');
+            const nameInput = document.getElementById('exerciseName');
+            
+            if (editMode && exerciseId) {
+                // Modo edición
+                title.textContent = 'Editar Ejercicio';
+                const dayKey = `day${currentDay}`;
+                const exercise = workoutData[dayKey].exercises.find(e => e.id === exerciseId);
+                if (exercise) {
+                    nameInput.value = exercise.name;
+                    editingExerciseId = exerciseId;
+                }
+            } else {
+                // Modo agregar
+                title.textContent = 'Agregar Nuevo Ejercicio';
+                nameInput.value = '';
+                editingExerciseId = null;
+            }
+            
+            modal.style.display = 'flex';
+            nameInput.focus();
+        }
+        
+        // Guardar ejercicio (nuevo o editado)
+        function saveExercise(e) {
+            e.preventDefault();
+            
+            const nameInput = document.getElementById('exerciseName');
+            const exerciseName = nameInput.value.trim();
+            
+            if (!exerciseName) {
+                alert('Por favor ingresa un nombre para el ejercicio');
+                return;
+            }
+            
+            const dayKey = `day${currentDay}`;
+            
+            if (editingExerciseId) {
+                // Editar ejercicio existente
+                const exerciseIndex = workoutData[dayKey].exercises.findIndex(e => e.id === editingExerciseId);
+                if (exerciseIndex !== -1) {
+                    workoutData[dayKey].exercises[exerciseIndex].name = exerciseName;
+                    
+                    // Actualizar también el nombre en los registros del usuario
+                    if (userData[currentUser][dayKey][editingExerciseId]) {
+                        userData[currentUser][dayKey][editingExerciseId].forEach(record => {
+                            record.exerciseName = exerciseName;
+                        });
+                    }
+                }
+            } else {
+                // Agregar nuevo ejercicio
+                const newId = Date.now(); // Usar timestamp como ID único
+                workoutData[dayKey].exercises.push({
+                    id: newId,
+                    name: exerciseName
+                });
+            }
+            
+            // Guardar cambios
+            saveWorkoutData();
+            saveUserData();
+            
+            // Cerrar modal y actualizar interfaz
+            closeExerciseModal();
+            renderExercises();
+        }
+        
+        // Editar ejercicio
+        function editExercise(e) {
+            const exerciseId = parseInt(e.currentTarget.dataset.exercise);
+            showExerciseModal(true, exerciseId);
+        }
+        
+        // Mostrar modal de confirmación para eliminar
+        function showDeleteModal(e) {
+            const exerciseId = parseInt(e.currentTarget.dataset.exercise);
+            const dayKey = `day${currentDay}`;
+            const exercise = workoutData[dayKey].exercises.find(e => e.id === exerciseId);
+            
+            if (!exercise) return;
+            
+            exerciseToDelete = exerciseId;
+            
+            const deleteMessage = document.getElementById('deleteMessage');
+            deleteMessage.textContent = `¿Estás seguro de que quieres eliminar el ejercicio "${exercise.name}"? También se eliminarán todos sus registros.`;
+            
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        
+        // Eliminar ejercicio
+        function deleteExercise() {
+            if (!exerciseToDelete) return;
+            
+            const dayKey = `day${currentDay}`;
+            
+            // Eliminar ejercicio de la lista
+            workoutData[dayKey].exercises = workoutData[dayKey].exercises.filter(e => e.id !== exerciseToDelete);
+            
+            // Eliminar registros del usuario para este ejercicio
+            if (userData[currentUser][dayKey][exerciseToDelete]) {
+                delete userData[currentUser][dayKey][exerciseToDelete];
+            }
+            
+            // Guardar cambios
+            saveWorkoutData();
+            saveUserData();
+            
+            // Cerrar modal y actualizar interfaz
+            closeDeleteModal();
+            renderExercises();
+            renderRecords();
+        }
+        
+        // Cerrar modal de ejercicio
+        function closeExerciseModal() {
+            document.getElementById('exerciseModal').style.display = 'none';
+            document.getElementById('exerciseForm').reset();
+        }
+        
+        // Cerrar modal de eliminación
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            exerciseToDelete = null;
+        }
+        
+        // Renderizar registros del día actual
+        function renderRecords() {
+            const recordsList = document.getElementById('recordsList');
+            const dayKey = `day${currentDay}`;
+            const userDayData = userData[currentUser][dayKey];
+            
+            recordsList.innerHTML = '';
+            
+            // Obtener todos los registros del día actual
+            let allRecords = [];
+            Object.keys(userDayData).forEach(exerciseId => {
+                if (userDayData[exerciseId]) {
+                    userDayData[exerciseId].forEach(record => {
+                        allRecords.push(record);
+                    });
+                }
+            });
+            
+            // Ordenar por fecha (más reciente primero)
+            allRecords.sort((a, b) => b.id - a.id);
+            
+            if (allRecords.length === 0) {
+                recordsList.innerHTML = '<div class="no-data">No hay registros para este día. ¡Empieza a entrenar!</div>';
+                return;
+            }
+            
+            // Mostrar solo los últimos 10 registros
+            const recentRecords = allRecords.slice(0, 10);
+            
+            recentRecords.forEach(record => {
+                const recordItem = document.createElement('div');
+                recordItem.className = 'record-item';
+                recordItem.innerHTML = `
+                    <div>
+                        <div class="record-info">${record.exerciseName}</div>
+                        <div class="record-date">${record.date} ${record.time}</div>
+                    </div>
+                    <div class="record-info">${record.weight}kg x ${record.reps} rep</div>
+                `;
+                recordsList.appendChild(recordItem);
+            });
+        }
+        
+        // Mostrar panel de gestión
+        function showManagePanel() {
+            const dayKey = `day${currentDay}`;
+            const exercises = workoutData[dayKey].exercises;
+            
+            let message = `Ejercicios del Día ${currentDay}:\n\n`;
+            
+            if (exercises.length === 0) {
+                message += "No hay ejercicios.\n";
+            } else {
+                exercises.forEach((exercise, index) => {
+                    message += `${index + 1}. ${exercise.name}\n`;
+                });
+            }
+            
+            message += "\nUsa los botones de edición (✏️) y eliminación (🗑️) junto a cada ejercicio para personalizar tu rutina.";
+            
+            alert(message);
+        }
+        
+        // Cambiar entre pestañas
+        function changeTab(tabName) {
+            // Actualizar botones del footer
+            document.querySelectorAll('.footer-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Mostrar/ocultar secciones
+            const exerciseSection = document.querySelector('.exercise-section');
+            const recordsSection = document.querySelector('.records-section');
+            
+            if (tabName === 'exercises') {
+                exerciseSection.style.display = 'block';
+                recordsSection.style.display = 'none';
+            } else if (tabName === 'records') {
+                exerciseSection.style.display = 'none';
+                recordsSection.style.display = 'block';
+            } else if (tabName === 'manage') {
+                showManagePanel();
+                // Volver a la pestaña de ejercicios
+                changeTab('exercises');
+            } else if (tabName === 'share') {
+                // Compartir datos
+                const shareData = {
+                    user: currentUser,
+                    data: userData[currentUser]
+                };
+                
+                const shareText = `Mis registros de entrenamiento:\nUsuario: ${currentUser}\n\nPuedes ver mis progresos en la aplicación de entrenamiento.`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Mis registros de entrenamiento',
+                        text: shareText,
+                        url: window.location.href
+                    });
+                } else {
+                    alert('Para compartir, puedes enviar este enlace a tu amigo:\n\n' + window.location.href + '\n\nCada uno puede ingresar su nombre para guardar sus propios registros.');
+                }
+                
+                // Volver a la pestaña de ejercicios
+                changeTab('exercises');
+            }
+        }
+        
+        // Inicializar aplicación
+        function initApp() {
+            initUserData();
+            
+            // Establecer usuario por defecto
+            document.getElementById('currentUser').textContent = currentUser;
+            
+            // Event listeners para selección de día
+            document.querySelectorAll('.day-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    changeDay(parseInt(card.dataset.day));
+                });
+            });
+            
+            // Event listener para botón de guardar nombre
+            document.getElementById('setUserBtn').addEventListener('click', () => {
+                const userName = document.getElementById('userName').value.trim();
+                if (userName) {
+                    changeUser(userName);
+                    document.getElementById('userName').value = '';
+                } else {
+                    alert('Por favor ingresa un nombre');
+                }
+            });
+            
+            // Event listener para botón de cambiar usuario
+            document.getElementById('changeUserBtn').addEventListener('click', () => {
+                document.getElementById('userName').focus();
+            });
+            
+            // Event listener para botón de agregar ejercicio
+            document.getElementById('addExerciseBtn').addEventListener('click', () => {
+                showExerciseModal();
+            });
+            
+            // Event listener para formulario de ejercicio
+            document.getElementById('exerciseForm').addEventListener('submit', saveExercise);
+            
+            // Event listeners para modales
+            document.getElementById('cancelExerciseBtn').addEventListener('click', closeExerciseModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteExercise);
+            
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', (e) => {
+                if (e.target.id === 'exerciseModal') {
+                    closeExerciseModal();
+                }
+                if (e.target.id === 'deleteModal') {
+                    closeDeleteModal();
+                }
+            });
+            
+            // Event listeners para el footer
+            document.querySelectorAll('.footer-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    changeTab(btn.dataset.tab);
+                });
+            });
+            
+            // Permitir Enter en el campo de nombre
+            document.getElementById('userName').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('setUserBtn').click();
+                }
+            });
+            
+            // Renderizar contenido inicial
+            renderExercises();
+            renderRecords();
+        }
+        
+        // Iniciar la aplicación cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
